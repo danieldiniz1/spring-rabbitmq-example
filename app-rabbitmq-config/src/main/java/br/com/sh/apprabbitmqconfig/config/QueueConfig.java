@@ -208,6 +208,8 @@ public class QueueConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(messageConverter);
+        factory.setConcurrentConsumers(1);
+        factory.setMaxConcurrentConsumers(4);
 
         factory.setAdviceChain(RetryInterceptorBuilder.stateless()
                 .retryOperations(retryTemplate)
@@ -225,6 +227,8 @@ public class QueueConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(messageConverter);
+        factory.setConcurrentConsumers(4);
+        factory.setMaxConcurrentConsumers(6);
 
         factory.setAdviceChain(RetryInterceptorBuilder.stateless()
                 .retryOperations(retryTemplate)

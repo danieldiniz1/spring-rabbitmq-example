@@ -20,19 +20,22 @@ public class AppRabbitmqConfigApplication {
     }
 
     @RabbitListener(queues = "${rabbitmq.exampleOnequeue.queue}",containerFactory = "listenerUm")
-    public void listenOne(Object message) {
+    public void listenOne(Object message) throws InterruptedException {
 //        LOGGER.info(" mensagem: {}",message);
         LOGGER.info("process queue one");
-        throw new RuntimeException("process queue one");
+        simualteProcess();
     }
 
     @RabbitListener(queues = "${rabbitmq.exampleTwoqueue.queue}",containerFactory = "listenerDois")
-    public void listenTwo(Object message) {
+    public void listenTwo(Object message) throws InterruptedException {
 //        LOGGER.info(" mensagem: {}",message);
         LOGGER.info("process queue two");
-        throw new RuntimeException("process queue two");
+        simualteProcess();
     }
 
+    private void simualteProcess() throws InterruptedException {
+        Thread.sleep(5000);
+    }
 
 
 }
