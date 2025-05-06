@@ -7,6 +7,8 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Objects;
+
 
 @SpringBootApplication
 public class AppRabbitmqConfigApplication {
@@ -18,8 +20,17 @@ public class AppRabbitmqConfigApplication {
     }
 
     @RabbitListener(queues = "${rabbitmq.exampleOnequeue.queue}",containerFactory = "listenerUm")
-    public void listen(String message) {
-        LOGGER.info(" mensagem: {}",message);
+    public void listenOne(Object message) {
+//        LOGGER.info(" mensagem: {}",message);
+        LOGGER.info("process queue one");
+        throw new RuntimeException("process queue one");
+    }
+
+    @RabbitListener(queues = "${rabbitmq.exampleTwoqueue.queue}",containerFactory = "listenerDois")
+    public void listenTwo(Object message) {
+//        LOGGER.info(" mensagem: {}",message);
+        LOGGER.info("process queue two");
+        throw new RuntimeException("process queue two");
     }
 
 

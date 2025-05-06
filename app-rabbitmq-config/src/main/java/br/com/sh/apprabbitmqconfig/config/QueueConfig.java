@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -168,7 +169,7 @@ public class QueueConfig {
         RetryTemplate retryTemplate = new RetryTemplate();
 
         ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-        backOffPolicy.setInitialInterval(3000);
+        backOffPolicy.setInitialInterval(1000);
         backOffPolicy.setMultiplier(2);
 
         retryTemplate.setBackOffPolicy(backOffPolicy);
@@ -181,9 +182,44 @@ public class QueueConfig {
         return retryTemplate;
     }
 
+    @Bean
+    public RetryTemplate retryTemplateDois() {
+        RetryTemplate retryTemplate = new RetryTemplate();
+
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(3000);
+        backOffPolicy.setMultiplier(2);
+
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+        retryPolicy.setMaxAttempts(2);
+
+        retryTemplate.setRetryPolicy(retryPolicy);
+
+        return retryTemplate;
+    }
+
     @Bean(name = "listenerUm")
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory,
                                                                                RetryTemplate retryTemplate,
+                                                                               MessageConverter messageConverter) {
+
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(messageConverter);
+
+        factory.setAdviceChain(RetryInterceptorBuilder.stateless()
+                .retryOperations(retryTemplate)
+                .recoverer(new RejectAndDontRequeueRecoverer())
+                .build());
+
+        return factory;
+    }
+
+    @Bean(name = "listenerDois")
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactoryDois(ConnectionFactory connectionFactory,
+                                                                               @Qualifier("retryTemplateDois") RetryTemplate retryTemplate,
                                                                                MessageConverter messageConverter) {
 
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
