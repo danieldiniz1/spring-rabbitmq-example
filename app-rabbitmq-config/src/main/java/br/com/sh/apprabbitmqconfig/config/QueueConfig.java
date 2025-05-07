@@ -156,9 +156,12 @@ public class QueueConfig {
 
     //    configura o RabbitTemplate
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
+                                         MessageConverter messageConverter,
+                                         @Qualifier("retryTemplate") RetryTemplate retryTemplate) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
+        rabbitTemplate.setRetryTemplate(retryTemplate);
         return rabbitTemplate;
     }
 
